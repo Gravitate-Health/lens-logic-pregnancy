@@ -11,22 +11,22 @@ const languageDict = {
         consult: "If you are pregnant, breastfeeding, think you may be pregnant, or plan to have a baby, consult your doctor or pharmacist before using this medicine."
     },
     es: {
-        childbearing: "Ves esto porque est\u00e1s en edad f\u00e9rtil.",
-        pregnant: "Ves esto porque est\u00e1s embarazada.",
-        breastfeeding: "Ves esto porque est\u00e1s amamantando.",
-        consult: "Si est\u00e1 embarazada, amamantando, cree que puede estar embarazada o planea tener un beb\u00e9, consulte a su m\u00e9dico o farmac\u00e9utico antes de usar este medicamento."
+        childbearing: "Ves esto porque estás en edad fértil.",
+        pregnant: "Ves esto porque estás embarazada.",
+        breastfeeding: "Ves esto porque estás amamantando.",
+        consult: "Si está embarazada, amamantando, cree que puede estar embarazada o planea tener un bebé, consulte a su médico o farmacéutico antes de usar este medicamento."
     },
     pt: {
-        childbearing: "Voc\u00ea est\u00e1 vendo isso porque est\u00e1 em idade f\u00e9rtil.",
-        pregnant: "Voc\u00ea est\u00e1 vendo isso porque est\u00e1 gr\u00e1vida.",
-        breastfeeding: "Voc\u00ea est\u00e1 vendo isso porque est\u00e1 amamentando.",
-        consult: "Se estiver gr\u00e1vida, amamentando, acha que pode estar gr\u00e1vida ou planeja ter um beb\u00ea, consulte seu m\u00e9dico ou farmac\u00eautico antes de usar este medicamento."
+        childbearing: "Você está vendo isso porque está em idade fértil.",
+        pregnant: "Você está vendo isso porque está grávida.",
+        breastfeeding: "Você está vendo isso porque está amamentando.",
+        consult: "Se estiver grávida, amamentando, acha que pode estar grávida ou planeja ter um bebê, consulte seu médico ou farmacêutico antes de usar este medicamento."
     },
     da: {
-        childbearing: "Du ser dette, fordi du er i den f\u00f8dedygtige alder.",
+        childbearing: "Du ser dette, fordi du er i den fødedygtige alder.",
         pregnant: "Du ser dette, fordi du er gravid.",
         breastfeeding: "Du ser dette, fordi du ammer.",
-        consult: "Hvis du er gravid, ammer, tror du kan v\u00e6re gravid eller planl\u00e6gger at f\u00e5 et barn, skal du kontakte din l\u00e6ge eller apotek, f\u00f8r du bruger dette l\u00e6gemiddel."
+        consult: "Hvis du er gravid, ammer, tror du kan være gravid eller planlægger at få et barn, skal du kontakte din læge eller apotek, før du bruger dette lægemiddel."
     }
 };
 
@@ -35,7 +35,7 @@ let pvData = pv;
 let htmlData = html;
 let epiData = epi;
 let ipsData = ips;
-let report = "";
+let lang = "";  // Default language, will be set by ePI
 // --- Utility: Get current specification version ---
 let getSpecification = () => "1.0.0";
 
@@ -202,21 +202,22 @@ let enhance = async () => {
     if (categories.length == 0) return htmlData;
     // Annotate HTML and return
 
-    report = getReport(lang);
+
     return await annotateHTMLsection(categories, enhanceTag);
 };
 
-// --- Explanation function: returns pregnancy status and report sentence in selected language ---
-function explanation(lang) {
-    console.warn("⚠️ Pregnancy Lens: Explanation function called.");
-    return getReport(lang);
+
+
+function getReport(lang) {
+    console.log("Generating report in language:", lang);
+    return { message: getExplanation(lang), status: pregnancyStatus };
+
+
 }
 
-
-
 // --- Get user-facing report sentence in the selected language ---
-function getReport() {
-    console.log("Generating report in language:", lang);
+function getExplanation(lang) {
+    console.log("Generating explanation in language:", lang);
     if (pregnancyStatus.pregnant) return languageDict[lang].pregnant;
     if (pregnancyStatus.breastfeeding) return languageDict[lang].breastfeeding;
     if (pregnancyStatus.childbearingAge) return languageDict[lang].childbearing;
@@ -227,8 +228,8 @@ function getReport() {
 return {
     enhance: enhance,
     getSpecification: getSpecification,
-    explanation: explanation,
-    report: report,
-    status: pregnancyStatus
+    explanation: (language) => getExplanation(language || lang),
+    report: (language) => getReport(language || lang),
 };
+
 
