@@ -35,7 +35,7 @@ let pvData = pv;
 let htmlData = html;
 let epiData = epi;
 let ipsData = ips;
-
+let report = "";
 // --- Utility: Get current specification version ---
 let getSpecification = () => "1.0.0";
 
@@ -46,13 +46,7 @@ let pregnancyStatus = {
     breastfeeding: false
 };
 
-// --- Get user-facing report sentence in the selected language ---
-function getReport(lang = "en") {
-    if (pregnancyStatus.pregnant) return languageDict[lang].pregnant;
-    if (pregnancyStatus.breastfeeding) return languageDict[lang].breastfeeding;
-    if (pregnancyStatus.childbearingAge) return languageDict[lang].childbearing;
-    return "";
-}
+
 
 // --- Annotate HTML with highlight/collapse for relevant categories ---
 let annotationProcess = (listOfCategories, enhanceTag, document, response) => {
@@ -106,7 +100,7 @@ let getIPSAge = (birthDate) => {
 };
 
 // --- Main enhance function ---
-let enhance = async (lang = "en") => {
+let enhance = async () => {
     // List of codes to search for in the ePI (pregnancy, breastfeeding, etc.)
     let listOfCategoriesToSearch = ["W78", "77386006", "69840006"];
     let gender;
@@ -128,6 +122,30 @@ let enhance = async (lang = "en") => {
             }
         }
     });
+
+
+    // 1. Check Composition.language
+    epi.entry?.forEach((entry) => {
+        const res = entry.resource;
+        if (res?.resourceType === "Composition" && res.language) {
+            lang = res.language;
+            console.log("🌍 Detected from Composition.language:", lang);
+        }
+    });
+
+    // 2. If not found, check Bundle.language
+    if (!lang && epi.language) {
+        lang = epi.language;
+        console.log("🌍 Detected from Bundle.language:", lang);
+    }
+
+    // 3. Fallback message
+    if (!lang) {
+        console.warn("⚠️ No language detected in Composition or Bundle.");
+    }
+
+
+
     // Check IPS for pregnancy/breastfeeding status
     const now = new Date();
     const twoYearsAgo = new Date();
@@ -183,18 +201,26 @@ let enhance = async (lang = "en") => {
     if (compositions == 0) throw new Error('Bad ePI: no category "Composition" found');
     if (categories.length == 0) return htmlData;
     // Annotate HTML and return
+
+    report = getReport(lang);
     return await annotateHTMLsection(categories, enhanceTag);
 };
 
 // --- Explanation function: returns pregnancy status and report sentence in selected language ---
-function explanation(lang = "en") {
+function explanation(lang) {
     console.warn("⚠️ Pregnancy Lens: Explanation function called.");
     return getReport(lang);
 }
 
-// --- Report function: returns only the report sentence in selected language ---
-function report(lang = "en") {
-    return getReport(lang);
+
+
+// --- Get user-facing report sentence in the selected language ---
+function getReport() {
+    console.log("Generating report in language:", lang);
+    if (pregnancyStatus.pregnant) return languageDict[lang].pregnant;
+    if (pregnancyStatus.breastfeeding) return languageDict[lang].breastfeeding;
+    if (pregnancyStatus.childbearingAge) return languageDict[lang].childbearing;
+    return "";
 }
 
 // --- Exported API ---
@@ -202,6 +228,7 @@ return {
     enhance: enhance,
     getSpecification: getSpecification,
     explanation: explanation,
-    report: report
+    report: report,
+    status: pregnancyStatus
 };
 

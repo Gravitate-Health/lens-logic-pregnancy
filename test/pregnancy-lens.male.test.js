@@ -31,7 +31,9 @@ test("should handle male patient (not childbearing)", async () => {
   const wrappedScript = `(function() {\n${scriptContent}\n})();`;
   const annotation = vm.runInContext(wrappedScript, context);
   await annotation.enhance();
-  const explanation = annotation.explanation("en");
-  expect(explanation.status.childbearingAge).toBe(false);
-  expect(explanation.message).toBe("");
+  const explanation = annotation.explanation();
+  const status = annotation.status;
+  expect(status.childbearingAge).toBe(false);
+  expect(explanation).toBe("");
+
 });

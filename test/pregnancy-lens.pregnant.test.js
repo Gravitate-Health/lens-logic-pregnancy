@@ -31,7 +31,9 @@ test("should handle pregnant patient", async () => {
   const wrappedScript = `(function() {\n${scriptContent}\n})();`;
   const annotation = vm.runInContext(wrappedScript, context);
   await annotation.enhance();
-  const explanation = annotation.explanation("en");
-  expect(explanation.status.pregnant).toBe(true);
-  expect(explanation.message).toBe("You are seeing this because you are pregnant.");
+  const explanation = annotation.explanation();
+  const status = annotation.status;
+
+  expect(status.pregnant).toBe(true);
+  expect(explanation).toBe("You are seeing this because you are pregnant.");
 });

@@ -31,7 +31,10 @@ test("should handle breastfeeding patient", async () => {
   const wrappedScript = `(function() {\n${scriptContent}\n})();`;
   const annotation = vm.runInContext(wrappedScript, context);
   await annotation.enhance();
-  const explanation = annotation.explanation("en");
-  expect(explanation.status.breastfeeding).toBe(true);
-  expect(explanation.message).toBe("You are seeing this because you are breastfeeding.");
+
+  const explanation = annotation.explanation();
+  const status = annotation.status;
+
+  expect(status.breastfeeding).toBe(true);
+  expect(explanation).toBe("You are seeing this because you are breastfeeding.");
 });

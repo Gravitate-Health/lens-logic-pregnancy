@@ -31,7 +31,9 @@ test("should handle female not of childbearing age (too young)", async () => {
   const wrappedScript = `(function() {\n${scriptContent}\n})();`;
   const annotation = vm.runInContext(wrappedScript, context);
   await annotation.enhance();
-  const explanationFn = annotation.explanation("en");
-  expect(explanationFn.status.childbearingAge).toBe(false);
-  expect(explanationFn.message).toBe("");
+  const explanationFn = annotation.explanation();
+  const status = annotation.status;
+
+  expect(status.childbearingAge).toBe(false);
+  expect(explanationFn).toBe("");
 });
