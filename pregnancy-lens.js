@@ -116,7 +116,7 @@ let enhance = async (lang = "en") => {
     ips.entry.forEach((element) => {
         if (element.resource.resourceType == "Patient") {
             gender = element.resource.gender;
-            console.log(("gender: " +gender));
+            console.log(("gender: " + gender));
             let age = getIPSAge(element.resource.birthDate);
             if (gender != "female" || age >= 60 || age < 14) {
                 console.log("Patient is not of childbearing age");
@@ -189,10 +189,7 @@ let enhance = async (lang = "en") => {
 // --- Explanation function: returns pregnancy status and report sentence in selected language ---
 function explanation(lang = "en") {
     console.warn("⚠️ Pregnancy Lens: Explanation function called.");
-    return {
-        status: pregnancyStatus,
-        message: getReport(lang)
-    };
+    return getReport(lang);
 }
 
 // --- Report function: returns only the report sentence in selected language ---
@@ -207,5 +204,4 @@ return {
     explanation: explanation,
     report: report
 };
-// ...end of file...
 
