@@ -38,6 +38,6 @@ test("should handle male patient (not childbearing)", async () => {
   console.log("Explanation:", explanation);
 
   expect(status.childbearingAge).toBe(false);
-  expect(explanation).toBe("");
+  expect(explanation).toBe("Pregnancy and breastfeeding information was collapsed since it isnt of importance to you.");
 
 });
